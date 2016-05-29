@@ -69,4 +69,13 @@ export default class ChromeStorage {
         });
     }
 
+    /**
+     * Removes all the links in the Chrome Synced Storage
+     *
+     * @param  {Function} callback
+     */
+    clearLinks(callback) {
+        chrome.storage.sync.clear(() => callback());
+    }
+
 };

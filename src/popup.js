@@ -49,8 +49,53 @@ function removeLinkHandler(e) {
 
     storage.removeLink(key, () => {
         renderer.message('Removed Link');
-        render();
+        renderer.redraw();
     });
+}
+
+/**
+ * Click Event Listener for the Add button.
+ * 1. Gets the title and url of the currently selected tab.
+ * 2. Add the object containing the id, title for the key equal to the url of the tab.
+ * 3. Increment link counter and update in sync storage
+ * 4. Updated the current list to show the newly added link item.
+ */
+function addLinkHandler() {
+    // Access the currently selected tab of chrome browser.
+    chrome.tabs.getSelected(null, tab => {
+        // Retrieve the scroll position in order to then store it
+        getScrollTop(tab.id, scrollTop => {
+            //Create list items and append them to the current list.
+            var newLink = {
+                title: tab.title,
+                url: tab.url,
+                scrollTop: scrollTop,
+                timestamp: new Date().getTime()
+            };
+
+            storage.addLink(newLink, () => {
+                renderer.message('Saved!');
+                renderer.redraw();
+            });
+        });
+    });
+}
+
+/**
+ * Click Event Listener for the Clear button.
+ *   1. Clears the local storage.
+ *   2. Re-initialize the link counter to 0.
+ *   3. Clear the current list.
+ */
+function clearLinksHandler() {
+    var confirmed = confirm('Are you sure you want to delete all links?');
+
+    if (confirmed) {
+        storage.clearLinks(() => {
+            renderer.message('Cleared!');
+            renderer.redraw();
+        });
+    }
 }
 
 function getScrollTop(tabId, callback) {
@@ -66,64 +111,8 @@ function getScrollTop(tabId, callback) {
     });
 }
 
-/**
- * Click Event Listener for the Add button.
- * 1. Gets the title and url of the currently selected tab.
- * 2. Add the object containing the id, title for the key equal to the url of the tab.
- * 3. Increment link counter and update in sync storage
- * 4. Updated the current list to show the newly added link item.
- */
-document.getElementById('addBtn').addEventListener('click', () => {
-    //Access the currently selected tab of chrome browser.
-    chrome.tabs.getSelected(null, tab => {
-        // Retrieve the scroll position in order to then store it
-        getScrollTop(tab.id, scrollTop => {
-            //Create list items and append them to the current list.
-            var newLink = {
-                title: tab.title,
-                url: tab.url,
-                scrollTop: scrollTop,
-                timestamp: new Date().getTime()
-            };
-
-            chrome.storage.sync.get(tab.url, items => {
-                /**
-                 * Add the link only if it is not present in the sync storage
-                 * If the storage already contains the item, display message 'Already Exists'
-                 */
-                if (Object.keys(items).length > 0) return renderer.message('Link Exists');
-
-                // Update the sync storage with the list of links containing the newly added link
-                var item = {};
-                item[tab.url] = newLink;
-
-                chrome.storage.sync.set(item, () => {
-                    renderer.message('Saved!');
-                    render();
-                });
-            });
-        });
-    });
-});
-
-/**
- * Click Event Listener for the Clear button.
- *   1. Clears the local storage.
- *   2. Re-initialize the link counter to 0.
- *   3. Clear the current list.
- */
-document.getElementById('clearBtn').addEventListener('click', () => {
-    var confirmVal = confirm('Are you sure you want to delete all links?');
-
-    if (confirmVal === true) {
-        chrome.storage.sync.clear(() => {
-            renderer.message('Cleared!');
-            updateBadge();
-        });
-
-        document.getElementById('links').innerHTML = '';
-    }
-});
+document.getElementById('addBtn').addEventListener('click', addLinkHandler);
+document.getElementById('clearBtn').addEventListener('click', clearLinksHandler);
 
 /**
  * Populate the extension with the list of currently stored links.

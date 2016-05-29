@@ -17,7 +17,22 @@ function openNewTab(data) {
         scroll = data.scroll;
 
     // Scroll To JS code
-    var code = 'window.onload = function() { document.body.scrollTop = ' + scroll + '; };';
+    var code = `
+(function () {
+    function goTo(n) {
+        // Try max 5 times
+        if (n === 6) return false;
+
+        document.body.scrollTop = ${scroll};
+
+        if (document.body.scrollTop != ${scroll}) {
+            window.setTimeout(goTo.bind(this, n+1), n * 250);
+        }
+    }
+
+    goTo(1);
+})();
+`;
 
     // Create the new tab
     chrome.tabs.create({ url: url }, tab => {
