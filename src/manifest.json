@@ -1,8 +1,13 @@
 {
-  "name": "Read Later",
+  "name": "PostponeIT",
   "version": "3.0.1",
   "manifest_version": 2,
-  "description": "Store links to read later.",
+  "description": "Procrastinate your readings ; store links and re-open them whenever",
+  "icons": {
+    "16": "images/icon16.png",
+    "48": "images/icon48.png",
+    "128": "images/icon128.png"
+  },
   "browser_action": {
     "default_icon": "images/icon.png",
     "default_popup": "popup.html"

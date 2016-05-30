@@ -16,12 +16,6 @@ body {
     .title {
         color: #555;
         font-size: 32px;
-        text-transform: uppercase;
-    }
-
-    .subtitle {
-        color: #AAA;
-        font-size: 16px;
     }
 }
 
@@ -52,8 +46,11 @@ body {
                 margin-bottom: 0;
             }
 
-            .favicon {
+            img.favicon {
                 margin-right: 0.5rem;
+                width: 20px;
+                height: 20px;
+                display: block;
             }
 
             #removeBtn {
@@ -67,6 +64,13 @@ body {
                 &:hover {
                     opacity: 0.5;
                 }
+            }
+
+            .title {
+                flex: 1;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
             }
         }
     }

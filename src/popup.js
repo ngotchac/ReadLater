@@ -11,10 +11,10 @@
  * Last Modified: 24th May, 2016
  */
 
-import ChromeStorage from './storage';
+import Storage from './storage';
 import Renderer from './renderer';
 
-var storage = new ChromeStorage();
+var storage = new Storage();
 
 var handlers = {
     openLink: openLinkHandler,
@@ -69,6 +69,7 @@ function addLinkHandler() {
             var newLink = {
                 title: tab.title,
                 url: tab.url,
+                favicon: tab.favIconUrl,
                 scrollTop: scrollTop,
                 timestamp: new Date().getTime()
             };
@@ -105,7 +106,7 @@ function getScrollTop(tabId, callback) {
         chrome.tabs.executeScript(tab.id, {
             code: 'document.body.scrollTop'
         }, result => {
-            var scrollTop = result[0];
+            var scrollTop = result ? result[0] || 0 : 0;
             callback(scrollTop);
         });
     });

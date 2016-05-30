@@ -58,35 +58,21 @@ export default class Renderer {
      * Create the HTML to be stored sinside each list item for every link
      */
     getLinkElement(link) {
-        var title = link.title;
+        let iconHTML = this.getIconHTML(link);
 
-        // If the link is too long, trim it
-        if (title.length > 40) {
-            title = title.substr(0, 37) + '...';
-        }
-
-        // The remove Element (trash icon)
-        var removeE = document.createElement('img');
-        removeE.setAttribute('id', 'removeBtn');
-        removeE.setAttribute('name', link.url);
-        removeE.setAttribute('src', './images/trash.svg');
-        removeE.addEventListener('click', this.removeLinkHandler.bind(removeE), false);
-
-        // The link Element (anchor)
-        var linkE = document.createElement('a');
-        linkE.setAttribute('id', 'link');
-        linkE.setAttribute('url', link.url);
-        linkE.setAttribute('scroll', link.scrollTop);
-        linkE.addEventListener('click', this.openLinkHandler.bind(linkE), false);
-        linkE.innerHTML = title;
-
-        // The icon Element
-        var iconE = this.getIconElement(link.url);
+        var html = `
+            <img id="removeBtn" name="${link.url}" src="images/trash.svg" />
+            ${iconHTML}
+            <a id="link" class="title" url="${link.url}" scroll="${link.scrollTop}">
+                ${link.title}
+            </a>
+        `;
 
         var liE = document.createElement('li');
-        liE.appendChild(removeE);
-        liE.appendChild(iconE);
-        liE.appendChild(linkE);
+        liE.innerHTML = html;
+
+        liE.querySelector('#link').addEventListener('click', this.openLinkHandler, false);
+        liE.querySelector('#removeBtn').addEventListener('click', this.removeLinkHandler, false);
 
         return liE;
     }
@@ -98,15 +84,9 @@ export default class Renderer {
      * @param  {String} url - The URL of the Website to get the Favicon from
      * @return {DOMElement}
      */
-    getIconElement(url){
-        var domain = url.replace('http://','').replace('https://','').split(/[/?#]/)[0];
-        var imgUrl = 'http://www.google.com/s2/favicons?domain=' + domain;
-
-        var img = document.createElement('img');
-        img.setAttribute('class', 'favicon');
-        img.setAttribute('src', imgUrl);
-
-        return img;
+    getIconHTML(link){
+        var imgUrl = link.favicon ? link.favicon : 'images/favicon.png';
+        return `<img class="favicon" src="${imgUrl}" />`;
     }
 
     updateBadge() {
